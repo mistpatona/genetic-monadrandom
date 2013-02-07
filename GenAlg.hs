@@ -9,6 +9,7 @@ import System.Random
 import Control.Applicative ( (<*>) )
 import Data.Function  (on)
 import Data.List (sortBy, sort, subsequences)
+import UsualRandom
 
 singleMutationProbability = 0.33 -- 1.0 / fromIntegral genomeLength
 
@@ -32,21 +33,7 @@ mutateOneNumber g x = if doMutation then y else x
     (a,g') = random g
     y = x * fst (randomR (-2,2) g')
 
--- | split is said to be not that good,
---   there must be a more effective solution to distribute randomness between functions
-iterateRandomGen :: RandomGen g => g -> [g]
-iterateRandomGen g = map fst $ iterate split' (g,g)
-    where split' = split . snd
 
-mutateGenomeWith :: RandomGen g => (g -> a -> a) -> g -> [a] -> [a]
-mutateGenomeWith g = mapWithRandom g f
-
--- | returns INFINITE list !
-applyRandom :: RandomGen g => g -> (g -> a) -> [a]
-applyRandom g f = map f (iterateRandomGen g)
-
-mapWithRandom :: RandomGen g => g -> (g -> a -> b) -> [a] -> [b]
-mapWithRandom g f = zipWith ($) (applyRandom g f) 
 
 orderByFitness :: Ord b => (a -> b) -> [a] -> [a]
 orderByFitness f = reverse . sortBy (compare `on` f) 
