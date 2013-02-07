@@ -1,10 +1,11 @@
 import System.Random
 import Control.Applicative ( (<*>) )
 import Data.Function  (on)
-import Data.List (sortBy, sort)
+import Data.List (sortBy, sort, subsequences)
 
-genomeLength = length sourceData
-sourceData = [1.2, -3.0, 0, -2, 4.1, 0, 0, 0, 0, 0]
+genomeLength = length $ zip sourceData1 sourceData2
+sourceData1 = [1.2, -3.0, 0, -2, 4.1, 0, 0, 0, 0, 0]
+sourceData2 = [1.2, -3.0, 2, 2, 1.1, 0, 0, 0, 0, 0]
 destinationSum = 0
 singleMutationProbability = 0.33 -- 1.0 / fromIntegral genomeLength
 refGen = read "aaa" :: StdGen
@@ -12,7 +13,9 @@ refGen = read "aaa" :: StdGen
 type GenomeElem = Double
 
 -- | the algo will MAXIMIZE the fitness function
-fitness = negate . abs . (destinationSum - ) . sum . zipWith (*) sourceData
+fitnessD s = negate . abs . (destinationSum - ) . sum . zipWith (*) s 
+-- fitness = negate . abs . (destinationSum - ) . sum . zipWith (*) sourceData
+fitness x =  fitnessD sourceData1 x + fitnessD sourceData2 x  
 
 makeRandomGenome :: RandomGen g => g -> [GenomeElem]
 makeRandomGenome = take genomeLength . randomRs (-1,1)
@@ -62,6 +65,19 @@ crossLinesBySchema (x:xs) as bs = take x as ++
 
 randomGenomes :: RandomGen g => g -> [[GenomeElem]]
 randomGenomes g = applyRandom g makeRandomGenome
+
+updateGeneration :: RandomGen g => g -> [[GenomeElem]] -> [[GenomeElem]]
+updateGeneration g as = take popSize $ cycle newPop
+    where popSize = length as
+          chosenSize = max 1 $ round $ (fromIntegral popSize :: Double) / 10
+          chosen = take chosenSize $ orderByFitness fitness as
+          pairs = filter ((==2).length) $ subsequences chosen
+          children = mapWithRandom g xxx $ pairs
+          xxx g (x:y:_) = crossGenomes g x y
+          newPop = chosen ++ children ++ mutants
+          mutants = []
+
+
 
 
 
