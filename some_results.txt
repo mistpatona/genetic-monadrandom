@@ -1,0 +1,10 @@
+some results.
+
+the initial conditions were:
+sourceData1 = [1.2, -3.0, 0, -2, 4.1] -- , 0, 0, 0, 0, 0]
+sourceData2 = [1.2, -3.0, 2, 2, 1.1] ++ repeat 0
+
+the more-or-less-fitting answer:
+[-0.5677278105225112,0.29836834737212126,-0.4863939049524879,0.8419966980646085,0.8656649745958478]
+-- the 8th generations, without mutations at all, only crossing
+   and saving parents :))
