@@ -9,8 +9,8 @@ iterateRandomGen g = map fst $ iterate split' (g,g)
     where split' = split . snd
 
 -- | returns INFINITE list !
-applyRandom :: RandomGen g => g -> (g -> a) -> [a]
-applyRandom g f = map f (iterateRandomGen g)
+iterateRandom :: RandomGen g => g -> (g -> a) -> [a]
+iterateRandom g f = map f (iterateRandomGen g)
 
 mapWithRandom :: RandomGen g => g -> (g -> a -> b) -> [a] -> [b]
 mapWithRandom g f = zipWith ($) (applyRandom g f) 

@@ -58,26 +58,25 @@ crossLinesBySchema (x:xs) as bs = take x as ++
 
 
 updateGeneration :: (RandomGen g,Ord k) => ([a]->k) -> g -> [[a]] -> [[a]]
-updateGeneration fitness g as = makeNewPop popSize mutants chosen
+updateGeneration fitness g as = updateGenerationNeck neckSize fitness g as
     where popSize = length as
-          chosenSize = max 1 $ round $ (fromIntegral popSize :: Double) * 0.1
+          neckSize = max 1 $ round $ (fromIntegral popSize :: Double) * 0.1
+          
+ 
+updateGenerationNeck :: (RandomGen g,Ord k) => Int -> ([a]->k) -> g -> [[a]] -> [[a]]
+updateGenerationNeck chosenSize fitness g as = take popSize mutants
+    where popSize = length as
           chosen = take chosenSize $ orderByFitness fitness as
-          pairs = filter ((==2).length) $ subsequences chosen
+          pairs = filter ((==2).length) $ subsequences chosen -- here is a big simplification
           children = mapWithRandom g xxx $ pairs
           xxx g (x:y:_) = crossGenomes g x y
-          mutants = children
-          
+          mutants = children          
+      
 
-makeNewPop popSize children parents = take popSize $ take k children ++ parents ++ drop k children 
-   where k = min popSize (length children) `div` 3           
-
-generations :: RandomGen g => ([a]->k) -> g -> [[a]] -> [ [[a]] ]
-generations fitness g x = y:generations fitness g2 y
+generations :: RandomGen g => (g -> b -> b) -> g -> b -> [b]
+generations f g x = y:generations' f g2 y
     where (g1,g2) = split g
-          y = updateGeneration fitness g1 x
-
-
-
+          y = f g1 x
 
 
 
