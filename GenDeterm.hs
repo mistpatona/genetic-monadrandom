@@ -19,8 +19,12 @@ orderByFitness f = sortBy (compare `on` f)
 
 
 crossLinesBySchema, clbs :: [Int] -> [a] -> [a] -> [a]
-crossLinesBySchema x p q = take n $ clbs x p q
-    where n = length $ zip p q -- choose lowest
+crossLinesBySchema x p q = clbs x p q
+--    where n = length $ zip p q -- choose lowest
+-- wiped away "choose lowest" : if genomes are of equal size,
+-- it will be no problem.
+-- if not, answers can also be of some size
+-- between parents, including edges.
 -- | does not always hold to the smallest array
 clbs _ [] _ = []
 clbs _ _ [] = []
