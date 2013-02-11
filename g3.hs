@@ -4,6 +4,7 @@ import Data.Function  (on)
 import Data.List (sortBy, sort, subsequences, nub)
 import GenDeterm
 import GenRand
+import GenStats
 import Control.Monad.Random
 import Control.Monad ( (>=>), liftM2 )
 
@@ -33,7 +34,7 @@ takeForBreed n = take (reproductionSizeAllPairs n)
 pairsForBreedOld = take m . makeAllPairs . takeForBreed m . cycle
     where m = genomeLength
 
-pairsForBreed inp = (take m . cycle . misalliancePairs . takeForBreed (m `div` 2) ) inp 
+pairsForBreed inp = (take m . cycle . misalliancePairs . takeForBreed (m)) inp 
     where m = length inp
 
 misalliancePairs xs = makeMisalliancePairs  (replicateTopsExp 10.0 tops) xs
@@ -46,7 +47,7 @@ crossAll :: (Int,Int) -> [([a],[a])] -> RS [[a]]
 crossAll chunkSizeBounds = mapM (uncurry $ crossGenomes chunkSizeBounds)
 
 mutateAll :: [[GenomeElem]] -> RS [[GenomeElem]]
-mutateAll = mutateGenomes (mutateP mutateR 0.02 >=> mutateP mutateA 0.05)
+mutateAll = mutateGenomes (mutateP mutateR 0.05 >=> mutateP mutateA 0.1)
 
 mutateP :: (a->RS a) -> Double -> a -> RS a
 mutateP f p x = do p1 <- getRandom
@@ -79,7 +80,7 @@ iterateM f x = do y <- f x
 
 
 top5 pop = take 5 $ map fitness $ orderByFitness fitness pop
-
+topReps = topRepeats . map fitness . orderByFitness fitness
 
 
 
