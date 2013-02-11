@@ -57,9 +57,4 @@ lightMulMutation = standardMulMutation { mutProbability = 0.001 }
   -- multiply by koef (+/-)[0.5  to  2] or just sometimes 0
 
 
-signumT :: (Eq a,Num a, Num b) => a -> b
-signumT x = case signum x of
-        0 -> 0
-        1 -> 1
-        (-1) -> -1
 

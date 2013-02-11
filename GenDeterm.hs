@@ -2,9 +2,9 @@
 
 module GenDeterm
        (orderByFitness
-       ,crossLinesBySchema
-       ,crossLinesBySchemaSaving
        ,makeAllPairs
+       ,reproductionSize
+       ,signumT
 	   )  where
 
 import Control.Applicative ( (<*>) )
@@ -17,40 +17,24 @@ import Data.List (sortBy, sort, subsequences)
 orderByFitness :: Ord b => (a -> b) -> [a] -> [a]
 orderByFitness f = sortBy (compare `on` f) 
 
-
-crossLinesBySchema, clbs :: [Int] -> [a] -> [a] -> [a]
-crossLinesBySchema x p q = clbs x p q
---    where n = length $ zip p q -- choose lowest
--- wiped away "choose lowest" : if genomes are of equal size,
--- it will be no problem.
--- if not, answers can also be of some size
--- between parents, including edges.
--- | does not always hold to the smallest array
-clbs _ [] _ = []
-clbs _ _ [] = []
-clbs [] _ _ = []
-clbs (x:xs) as bs = take x as ++
-     clbs xs (drop x bs) (drop x as)
-
--- | this version saves the rest of elements from [Int] array:
---   randomness is precious in brutal pure functional world
-crossLinesBySchemaSaving, clbss :: [Int] -> [a] -> [a] -> ([a],[Int])
-crossLinesBySchemaSaving x p q = clbss x p q
-   --  where n = length $ zip p q -- choose lowest
--- | does not always hold to the smallest array
-clbss x [] _ = ([],x)
-clbss x _ [] = ([],x)
--- this cannot happen: clbss [] _ _ = []
-clbss (x:xs) as bs = (take x as ++ ans, rest)
-   where (ans, rest) = clbss xs (drop x bs) (drop x as)
-
 makeAllPairs :: [a] -> [(a,a)]
 makeAllPairs [] = []
 makeAllPairs (x:xs) = pairs (x:xs) ++ makeAllPairs xs
     where pairs [] = []
           pairs (x:xs) = map (x,) (x:xs) -- a pair with itself is added too
 
+reproductionSize :: Int -> Int
+reproductionSize = ceiling . (\x ->   0.5 * (1 + sqrt (x * 8 + 1)) ) . fromIntegral 
+-- reproductionSize = ceiling . (0.5 +) sqrt . (0.25 + ) . fromIntegral . (* 2)
+-- 0.5 * (2 + sqrt (1 + 8*m))
+-- reproductionSize = ceiling . sqrt . fromIntegral . (* 2)
+-- m =~ n*(n-1)/2
 
+signumT :: (Eq a,Num a, Num b) => a -> b
+signumT x = case signum x of
+        0 -> 0
+        1 -> 1
+        (-1) -> -1
 
 
 
